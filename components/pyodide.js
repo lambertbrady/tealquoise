@@ -1,33 +1,38 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function Pyodide() {
-  const pythonCodeString = '1+2'
+export default function Pyodide({ pythonCode }) {
+  const pyodideReadyPromise = useRef(null)
+  const [pyodideOutput, setPyodideOutput] = useState('[loading Pyodide...]')
 
-  let pyodideReadyPromise = useRef(null)
-  let [pyodideOutput, setPyodideOutput] = useState('[loading Pyodide...]')
+  // load pyodide wasm module and initialize
+  async function main() {
+    return await window.loadPyodide({
+      indexURL: 'https://cdn.jsdelivr.net/pyodide/dev/full/'
+    })
+  }
+  // evaluate python code with pyodide
+  async function evaluatePython(pyodidePromise, pythonCode) {
+    const pyodide = await pyodidePromise
+    try {
+      return pyodide.runPython(pythonCode)
+    } catch (err) {
+      console.error(err)
+      return `Error evaluating Python code. See console for details.`
+    }
+  }
 
   useEffect(() => {
-    // load pyodide wasm module and initialize
-    async function main() {
-      return await window.loadPyodide({
-        indexURL: 'https://cdn.jsdelivr.net/pyodide/dev/full/'
-      })
-    }
     // only call main to load pyodide once, otherwise it will result in an error
     if (pyodideReadyPromise.current === null) {
       pyodideReadyPromise.current = main()
     }
-
-    async function evaluatePython(pythonCode) {
-      let pyodide = await pyodideReadyPromise.current
-      try {
-        setPyodideOutput(pyodide.runPython(pythonCode))
-      } catch (err) {
-        console.error(err)
-      }
-    }
-    evaluatePython(pythonCodeString)
-  }, [])
+    // update state of pyodideOutput with result of evaluated python code
+    ;(async function () {
+      setPyodideOutput(
+        await evaluatePython(pyodideReadyPromise.current, pythonCode)
+      )
+    })()
+  }, [pythonCode])
 
   return (
     <>

@@ -7,7 +7,7 @@ export default function Test() {
     <Layout>
       <Container>
         <div>TEST</div>
-        <Pyodide />
+        <Pyodide pythonCode="1+2" />
       </Container>
     </Layout>
   )
