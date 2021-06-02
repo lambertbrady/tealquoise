@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function Pyodide({ pythonCode }) {
+export default function Pyodide({ id, pythonCode }) {
   const pyodideReadyPromise = useRef(null)
   const [pyodideOutput, setPyodideOutput] = useState('[loading Pyodide...]')
 
@@ -36,7 +36,7 @@ export default function Pyodide({ pythonCode }) {
 
   return (
     <>
-      <div>Pyodide Output: {pyodideOutput}</div>
+      <div id={id}>Pyodide Output: {pyodideOutput}</div>
     </>
   )
 }
