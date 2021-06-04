@@ -1,13 +1,11 @@
 module.exports = {
+  future: {
+    webpack5: true
+  },
   webpack: (config) => {
-    // syntax for webpack 5 (but custom next.js config uses webpack 4)
-    // config.module.rules.push({
-    //   test: /\.py/,
-    //   type: 'asset/resource'
-    // })
     config.module.rules.push({
       test: /\.py/,
-      use: 'raw-loader'
+      type: 'asset/source'
     })
 
     return config

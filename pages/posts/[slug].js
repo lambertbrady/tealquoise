@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import ErrorPage from 'next/error'
 import Container from '../../components/container'
 import PostBody from '../../components/post-body'
-import Header from '../../components/header'
 import PostHeader from '../../components/post-header'
 import Layout from '../../components/layout'
 import { getPostBySlug, getAllPosts } from '../../lib/api'
@@ -11,7 +10,7 @@ import Head from 'next/head'
 import { CMS_NAME } from '../../lib/constants'
 import markdownToHtml from '../../lib/markdownToHtml'
 
-export default function Post({ post, morePosts, preview }) {
+export default function Post({ post, preview }) {
   const router = useRouter()
   if (!router.isFallback && !post?.slug) {
     return <ErrorPage statusCode={404} />
@@ -19,7 +18,6 @@ export default function Post({ post, morePosts, preview }) {
   return (
     <Layout preview={preview}>
       <Container>
-        <Header />
         {router.isFallback ? (
           <PostTitle>Loading…</PostTitle>
         ) : (
@@ -54,7 +52,7 @@ export async function getStaticProps({ params }) {
     'author',
     'content',
     'ogImage',
-    'coverImage',
+    'coverImage'
   ])
   const content = await markdownToHtml(post.content || '')
 
@@ -62,9 +60,9 @@ export async function getStaticProps({ params }) {
     props: {
       post: {
         ...post,
-        content,
-      },
-    },
+        content
+      }
+    }
   }
 }
 
@@ -75,10 +73,10 @@ export async function getStaticPaths() {
     paths: posts.map((post) => {
       return {
         params: {
-          slug: post.slug,
-        },
+          slug: post.slug
+        }
       }
     }),
-    fallback: false,
+    fallback: false
   }
 }

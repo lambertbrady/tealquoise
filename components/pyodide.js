@@ -1,42 +1,38 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { PyodideContext } from './pyodide-provider'
 
-export default function Pyodide({ id, pythonCode }) {
-  const pyodideReadyPromise = useRef(null)
-  const [pyodideOutput, setPyodideOutput] = useState('[loading Pyodide...]')
+export default function Pyodide({
+  id,
+  loadingMessage = 'loading...',
+  evaluatingMessage = 'evaluating...',
+  pythonCode
+}) {
+  const { isPyodideLoading, pyodide } = useContext(PyodideContext)
+  const [pyodideOutput, setPyodideOutput] = useState(evaluatingMessage)
 
-  // load pyodide wasm module and initialize
-  async function main() {
-    return await window.loadPyodide({
-      indexURL: 'https://cdn.jsdelivr.net/pyodide/dev/full/'
-    })
-  }
-  // evaluate python code with pyodide
-  async function evaluatePython(pyodidePromise, pythonCode) {
-    const pyodide = await pyodidePromise
-    try {
-      return pyodide.runPython(pythonCode)
-    } catch (err) {
-      console.error(err)
-      return `Error evaluating Python code. See console for details.`
-    }
-  }
-
+  // component rerenders when isLoading changes, which is set inside PyodideProvider and updated via context
   useEffect(() => {
-    // only call main to load pyodide once, otherwise it will result in an error
-    if (pyodideReadyPromise.current === null) {
-      pyodideReadyPromise.current = main()
+    // evaluate python code with pyodide
+    async function evaluatePython(pyodide, pythonCode) {
+      try {
+        return (await pyodide).runPython(pythonCode)
+      } catch (err) {
+        console.error(err)
+        return `Error evaluating Python code. See console for details.`
+      }
     }
-    // update state of pyodideOutput with result of evaluated python code
-    ;(async function () {
-      setPyodideOutput(
-        await evaluatePython(pyodideReadyPromise.current, pythonCode)
-      )
-    })()
-  }, [pythonCode])
+    if (!isPyodideLoading) {
+      ;(async function () {
+        setPyodideOutput(await evaluatePython(pyodide.current, pythonCode))
+      })()
+    }
+  }, [isPyodideLoading, pyodide, pythonCode])
 
   return (
     <>
-      <div id={id}>Pyodide Output: {pyodideOutput}</div>
+      <div id={id}>
+        Pyodide Output: {isPyodideLoading ? loadingMessage : pyodideOutput}
+      </div>
     </>
   )
 }

@@ -17,7 +17,6 @@ export default function Index({ allPosts }) {
           <title>Next.js Blog Example with {CMS_NAME}</title>
         </Head>
         <Container>
-          <script>loadPyodide()</script>
           <Intro />
           {heroPost && (
             <HeroPost

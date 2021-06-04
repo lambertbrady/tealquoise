@@ -4,9 +4,7 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head>
-          <script src="https://cdn.jsdelivr.net/pyodide/dev/full/pyodide.js" />
-        </Head>
+        <Head />
         <body>
           <Main />
           <NextScript />
