@@ -7,32 +7,50 @@ export default function Pyodide({
   evaluatingMessage = 'evaluating...',
   pythonCode
 }) {
-  const { isPyodideLoading, pyodide } = useContext(PyodideContext)
+  const {
+    indexURL,
+    pyodide,
+    hasLoadPyodideBeenCalled,
+    isPyodideLoading,
+    setIsPyodideLoading
+  } = useContext(PyodideContext)
   const [pyodideOutput, setPyodideOutput] = useState(evaluatingMessage)
 
-  // component rerenders when isLoading changes, which is set inside PyodideProvider and updated via context
+  // load pyodide wasm module and initialize it
   useEffect(() => {
-    // evaluate python code with pyodide
-    async function evaluatePython(pyodide, pythonCode) {
+    if (!hasLoadPyodideBeenCalled.current) {
+      // immediately set hasLoadPyodideBeenCalled ref, which is part of context, to true
+      // this prevents any additional Pyodide components from calling loadPyodide a second time
+      hasLoadPyodideBeenCalled.current = true
+      ;(async function () {
+        pyodide.current = await globalThis.loadPyodide({ indexURL })
+        // updating value of isPyodideLoading triggers second useEffect
+        setIsPyodideLoading(false)
+      })()
+    }
+    // pyodide and hasLoadPyodideBeenCalled are both refs and setIsPyodideLoading is a setState function (from context)
+    // as a result, these dependencies will be stable and never cause the component to re-render
+  }, [indexURL, pyodide, hasLoadPyodideBeenCalled, setIsPyodideLoading])
+
+  // evaluate python code with pyodide and set output
+  useEffect(() => {
+    const evaluatePython = (pyodide, pythonCode) => {
       try {
-        return (await pyodide).runPython(pythonCode)
+        return pyodide.runPython(pythonCode)
       } catch (err) {
         console.error(err)
         return `Error evaluating Python code. See console for details.`
       }
     }
     if (!isPyodideLoading) {
-      ;(async function () {
-        setPyodideOutput(await evaluatePython(pyodide.current, pythonCode))
-      })()
+      setPyodideOutput(evaluatePython(pyodide.current, pythonCode))
     }
-  }, [isPyodideLoading, pyodide, pythonCode])
+    // component re-renders when isPyodideLoading changes, which is set with first useEffect and updated via context
+  }, [pyodide, isPyodideLoading, pythonCode])
 
   return (
-    <>
-      <div id={id}>
-        Pyodide Output: {isPyodideLoading ? loadingMessage : pyodideOutput}
-      </div>
-    </>
+    <div id={id}>
+      Pyodide Output: {isPyodideLoading ? loadingMessage : pyodideOutput}
+    </div>
   )
 }

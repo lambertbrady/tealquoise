@@ -11,7 +11,7 @@ export default function Test() {
         {/* TODO: pass id or element as argument to python so events can target appropriate component */}
         {/* NOTE: currently, pythonCode is only adding event listeners to 'py-test' */}
         <Pyodide id="py-test" pythonCode={test} />
-        <Pyodide id="py-test2" pythonCode={test} />
+        <Pyodide id="py-test2" pythonCode={'1+3'} />
       </Container>
     </Layout>
   )

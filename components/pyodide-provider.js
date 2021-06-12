@@ -1,29 +1,28 @@
-import { createContext, useEffect, useRef, useState } from 'react'
+import { createContext, useRef, useState } from 'react'
 import Head from 'next/head'
 
 export const PyodideContext = createContext()
 
 export default function PyodideProvider({ children }) {
+  const indexURL = 'https://cdn.jsdelivr.net/pyodide/dev/full/'
   const pyodide = useRef(null)
+  const hasLoadPyodideBeenCalled = useRef(false)
   const [isPyodideLoading, setIsPyodideLoading] = useState(true)
-
-  useEffect(() => {
-    async function main() {
-      // load pyodide wasm module and initialize it
-      pyodide.current = await globalThis.loadPyodide({
-        indexURL: 'https://cdn.jsdelivr.net/pyodide/dev/full/'
-      })
-      setIsPyodideLoading(false)
-    }
-    main()
-  }, [])
 
   return (
     <>
       <Head>
-        <script src="https://cdn.jsdelivr.net/pyodide/dev/full/pyodide.js" />
+        <script src={`${indexURL}pyodide.js`} />
       </Head>
-      <PyodideContext.Provider value={{ isPyodideLoading, pyodide }}>
+      <PyodideContext.Provider
+        value={{
+          indexURL,
+          pyodide,
+          hasLoadPyodideBeenCalled,
+          isPyodideLoading,
+          setIsPyodideLoading
+        }}
+      >
         {children}
       </PyodideContext.Provider>
     </>
