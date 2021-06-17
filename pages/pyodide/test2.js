@@ -1,7 +1,7 @@
 import Container from '../../components/container'
 import Layout from '../../components/layout'
 import Pyodide from '../../components/pyodide'
-import test from '../../public/assets/python/test.py'
+import test from '../../lib/python/test.py'
 
 export default function Test() {
   return (
