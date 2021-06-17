@@ -1,4 +1,6 @@
 import Layout from '../../components/layout'
+import Pyodide from '../../components/pyodide'
+import test from '../../public/assets/python/test.py'
 
 export const meta = {
   title: 'Markdown/MDX with Next.js',
@@ -6,5 +8,13 @@ export const meta = {
 }
 
 I **love** using [Next.js](https://nextjs.org/)
+
+This is a Pyodide component. Click on it when it's done loading:
+
+<Pyodide id="py-test" pythonCode={test} />
+
+This is a Pyodide component. Python, what's '1+3'?
+
+<Pyodide id="py-test2" pythonCode={'1+3'} />
 
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>
