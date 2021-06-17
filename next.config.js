@@ -4,6 +4,7 @@ const withMDX = require('@next/mdx')({
 })
 
 const nextConfig = {
+  pageExtensions: ['js', 'jsx', 'mdx'],
   future: {
     webpack5: true
   },
@@ -17,11 +18,4 @@ const nextConfig = {
   }
 }
 
-module.exports = withPlugins(
-  [
-    withMDX({
-      pageExtensions: ['js', 'jsx', 'mdx']
-    })
-  ],
-  nextConfig
-)
+module.exports = withPlugins([[withMDX]], nextConfig)
