@@ -9,7 +9,7 @@ export default function PostPreview({
   date,
   excerpt,
   author,
-  slug,
+  slug
 }) {
   return (
     <div>
