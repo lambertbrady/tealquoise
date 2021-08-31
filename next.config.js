@@ -5,9 +5,6 @@ const withMDX = require('@next/mdx')({
 
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'mdx'],
-  future: {
-    webpack5: true
-  },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.py/,
