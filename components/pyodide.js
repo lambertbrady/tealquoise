@@ -1,14 +1,15 @@
 import { useContext, useEffect, useState } from 'react'
+import Head from 'next/head'
 import { PyodideContext } from './pyodide-provider'
 
 export default function Pyodide({
   id,
+  pythonCode,
   loadingMessage = 'loading...',
-  evaluatingMessage = 'evaluating...',
-  pythonCode
+  evaluatingMessage = 'evaluating...'
 }) {
+  const indexURL = 'https://cdn.jsdelivr.net/pyodide/dev/full/'
   const {
-    indexURL,
     pyodide,
     hasLoadPyodideBeenCalled,
     isPyodideLoading,
@@ -30,27 +31,34 @@ export default function Pyodide({
     }
     // pyodide and hasLoadPyodideBeenCalled are both refs and setIsPyodideLoading is a setState function (from context)
     // as a result, these dependencies will be stable and never cause the component to re-render
-  }, [indexURL, pyodide, hasLoadPyodideBeenCalled, setIsPyodideLoading])
+  }, [pyodide, hasLoadPyodideBeenCalled, setIsPyodideLoading])
 
   // evaluate python code with pyodide and set output
   useEffect(() => {
-    const evaluatePython = (pyodide, pythonCode) => {
-      try {
-        return pyodide.runPython(pythonCode)
-      } catch (err) {
-        console.error(err)
-        return `Error evaluating Python code. See console for details.`
-      }
-    }
     if (!isPyodideLoading) {
-      setPyodideOutput(evaluatePython(pyodide.current, pythonCode))
+      const evaluatePython = async (pyodide, pythonCode) => {
+        try {
+          return await pyodide.runPython(pythonCode)
+        } catch (error) {
+          console.error(error)
+          return 'Error evaluating Python code. See console for details.'
+        }
+      }
+      ;(async function () {
+        setPyodideOutput(await evaluatePython(pyodide.current, pythonCode))
+      })()
     }
     // component re-renders when isPyodideLoading changes, which is set with first useEffect and updated via context
-  }, [pyodide, isPyodideLoading, pythonCode])
+  }, [isPyodideLoading, pyodide, pythonCode])
 
   return (
-    <div id={id}>
-      Pyodide Output: {isPyodideLoading ? loadingMessage : pyodideOutput}
-    </div>
+    <>
+      <Head>
+        <script src={`${indexURL}pyodide.js`} />
+      </Head>
+      <div id={id}>
+        Pyodide Output: {isPyodideLoading ? loadingMessage : pyodideOutput}
+      </div>
+    </>
   )
 }

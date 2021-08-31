@@ -1,0 +1,21 @@
+import Layout from '../../components/layout'
+import Box from '../../components/three-box'
+import { Canvas } from '@react-three/fiber'
+
+export const meta = {
+  title: 'Markdown/MDX with Next.js',
+  author: 'Brady'
+}
+
+I **love** using [Next.js](https://nextjs.org/)
+
+This is a React Three Fiber component:
+
+<Canvas>
+  <ambientLight />
+  <pointLight position={[10, 10, 10]} />
+  <Box position={[-1.2, 0, 0]} />
+  <Box position={[1.2, 0, 0]} />
+</Canvas>
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>
